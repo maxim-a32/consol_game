@@ -32,17 +32,11 @@ class Game:
             self.game_state['Peers_hp'] = Peers.hp
             self.game_state['actionn'] = []
             self.game_state['number'] = 0
-        #hp = Pers.hp
-        #hp1 = Peers.hp
         regulationss = int(input("якщо бажаєте познайомитися з правилами гри ведіть 1 якщо ні 2"))
         if regulationss == 1:
             print(self.regulations)
-        #actionn = []
         number = self.game_state['number']
-        #with open("game_state.json", "w") as f:
         while self.run:
-            #Pers.hp -= (Peers.demeg - Pers.protection)
-            #Peers.hp -= (Pers.demeg - Peers.protection)
             action = []
             action.append(int(input("Ведіть першу дію 1 атака 2 захист")))
             action.append(int(input("Ведіть другу дію 1 атака 2 захист")))
@@ -63,7 +57,6 @@ class Game:
             self.game_state['hp'] -= (demeg1 - protection)
             print("Ваше здоров'я", self.game_state['hp'])
             print("Здоров'я суперника", self.game_state['Peers_hp'])
-            #number += 1
             if self.game_state['hp'] <= 0:
                 self.vin = False
                 self.run = False
@@ -86,6 +79,8 @@ class Game:
         with open("game_state.json", "+w") as f:
             json.dump(self.game_state, f)
 class Start:
+    listt = []
+    start = []
     def startt(self):
         try:
             with open("game_state.json", "r") as file:
@@ -99,14 +94,10 @@ class Start:
                         gamee.game_state['run'] = False
         except FileNotFoundError:
             pass
-        #except JSONDecodeError:
-            #pass
-        start = int(input("Ведіть 1 щоб створити свого персонажа, 2 щоб вибрати одного з запропонованих, 3 щоб вибрати один з інснуючих варіантів, 4 щоб завантажити з json файлу"))
+        self.createe()
+        start = int(input("Ведіть 1 щоб створити свого персонажа, 2 щоб вибрати одного з запропонованих, 3 щоб вибрати один з інснуючих варіантів, 4 Відновити з json файлу"))
         if start == 2:
-            pers.Print()
-            name = input("Ведіть назву персонаж")
-            perss = pers.pers(name)
-            gamee.game(perss, peers)
+            self.choice()
         if start == 1:
             pErs = character.Pers()
             pErs.creation2()
@@ -155,20 +146,71 @@ class Start:
             self.json_file()
             #gamee.game(pErs, peers)
     def json_file(self):
-        file = input("Ведіть шлях до файлу")
+        run = True
+        while run:
+            file = input("Ведіть шлях до файлу")
+            try:
+                with open(file, "r") as fille:
+                    data = json.load(fille)
+                    print(type(data))
+                    nam = data['name']
+                    dameg = data['dameg']
+                    hp = data['hp']
+                    protection = data['protection']
+                    filee ={
+                        'name': []
+                        }# список створюється зановокожен раз для того щоб не було декількох однакових персонажей
+                    with open('file.json', 'r') as f:
+                        filee = json.load(f)# спочатку переносить всі дані в програму
+                        filee['name'].append(file)
+                    with open('file.json', '+w') as f:
+                        json.dump(filee, f)# потім видаляє старий вміст і додає новий
+            except FileNotFoundError:
+                print("Нажаль такого файлу не існує або був введений неправильний шлях")
+            i = input("Ведіть 1 щоб відновити ще одного персонажа чи будьщо інше щоб почати гру")
+            if i == "1":
+                pass
+            else:
+                run = False
+        self.createe()
+        self.choice()
+    def choice(self):
+        pers.Print()
+        name = input("Ведіть назву персонажа")
+        perss = pers.pers(name)
+        gamee.game(perss, peers)
+    def createe(self):
+        i = 0
         try:
-            with open(file, "r") as fille:
-                data = json.load(fille)
-                print(type(data))
-                nam = data['name']
-                dameg = data['dameg']
-                hp = data['hp']
-                protection = data['protection']
-                pErs = character.Pers()
-                pErs.creation(dameg, nam, hp, protection)
-                gamee.game(pErs,peers)
+            with open('file.json', 'r') as f:
+                fille = json.load(f)
+                self.start = fille['name']
         except FileNotFoundError:
-            print("Нажаль такого файлу не існує або був введений неправильний шлях")
+            print('Нажаль фаїл зі збереженнями не знайдено його буде автоматично відновлено')
+            File = {
+                'name': []
+                }
+            with open('file.json', '+w') as f:
+                json.dump(File, f)
+        for l in self.start:
+            file = l
+            try:
+                with open(file, "r") as f:
+                    data = json.load(f)
+                    name = data['name']
+                    dameg = data['dameg']
+                    hp = data['hp']
+                    protection = data['protection']
+                    if name == None:
+                        pass
+                    else:
+                        self.listt.append(character.Pers())
+                        a = self.listt[i]
+                        a.creation(dameg, name, hp, protection)
+                    i += 1
+            except FileNotFoundError:
+                print("Персонажа не знайдено")
+                    
 class Save:
     def save(self, vin, Pers, Peers):
         sav = input("Ведіть назву файлу в який буде збережено результат")

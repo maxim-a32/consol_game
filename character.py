@@ -1,3 +1,4 @@
+import json
 class Pers:
     demeg = None
     name = None
@@ -18,20 +19,45 @@ class Pers:
         self.protection = int(input("Ведіть захист"))
         creation3 = int(input("Якщо хочете зберегти персонажа ведіть 1 якщо ні 2"))
         if creation3 == 1:
-            demeg = str(self.demeg)
-            hp = str(self.hp)
-            protection = str(self.protection)
+            #demeg = str(self.demeg)
+            #hp = str(self.hp)
+            #protection = str(self.protection)
+            save_file = {
+                'dameg': self.demeg,
+                'name': self.name,
+                'hp': self.hp,
+                'protection': self.protection
+                }
             text = input("Ведіть назву файлу в який збереже персонажа фаїл буде створеноо автоматично тому для коректного збереження будьласка ведь фаїл якого не існує розширення буде додано автоматично")
-            text += ".txt"
-            file = open(text, "a+")
-            file.write(self.name)
-            file.write(";")
-            file.write(demeg)
-            file.write(";")
-            file.write(hp)
-            file.write(";")
-            file.write(protection)
-            file.write(";")
+            text += ".json"
+            file = open(text, "w+")
+            json.dump(save_file, file)
+            file.close()
+            fille = {}
+            try:
+                with open('file.json', 'r') as f:
+                    fille = json.load(f)
+                    fille['name'].append(text)
+            except FileNotFoundError:
+                print("Фаїл для збереження не був знайдений генерація нового файлу щоб повернути файли скорестайтеся функцією повенення")
+                File = {
+                    'name': []
+                    }
+                with open('file.json', '+w') as f:
+                    json.dump(File, f)
+                with open('file.json', 'r') as f:
+                    fille = json.load(f)
+                    fille['name'].append(text)
+            with open('file.json', '+w') as f:
+                json.dump(fille, f)
+            #file.write(self.name)
+            #file.write(";")
+            #file.write(demeg)
+            #file.write(";")
+            #file.write(hp)
+            #file.write(";")
+            #file.write(protection)
+            #file.write(";")
             file.close()
     def pers(self, name):
         for li in Pers.listt:
